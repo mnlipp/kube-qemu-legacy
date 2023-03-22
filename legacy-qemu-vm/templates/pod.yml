@@ -38,15 +38,17 @@ spec:
         -no-user-config
         -name guest={{ .Release.Name }},debug-threads=on
         -uuid {{ required "Valid .Values.vm.machineUuid entry required" .Values.vm.machineUuid }}
-        -machine pc-q35-6.2,usb=off,vmport=off,{{ if .Values.vm.secureBoot }}smm=on,{{ end }}dump-guest-core=off,pflash0=efi-bios-rom-device,pflash1=efi-bios-eeprom-device,memory-backend=pc.ram,hpet=off
+        -machine pc-q35-6.2,usb=off,vmport=off,{{ if .Values.vm.secureBoot }},smm=on{{ end }}dump-guest-core=off{{ if .Values.vm.efiBoot }},pflash0=efi-bios-rom-device,pflash1=efi-bios-eeprom-device{{ end }},memory-backend=pc.ram,hpet=off
             {{- if .Values.vm.secureBoot }}
             -global driver=cfi.pflash01,property=secure,value=on 
             -object '{"qom-type":"secret","id":"masterKey0","format":"raw","file":"/var/local/qemu/master-key.aes"}'
             {{- end }}
+            {{- if .Values.vm.efiBoot }}
             -blockdev '{"node-name":"efi-bios-rom-backend","driver":"file","filename":"/usr/share/OVMF/OVMF_CODE.fd","auto-read-only":true,"discard":"unmap"}'
             -blockdev '{"node-name":"efi-bios-rom-device","driver":"raw","read-only":true,"file":"efi-bios-rom-backend"}'
             -blockdev '{"node-name":"efi-bios-eeprom-backend","driver":"file","filename":"/var/local/qemu/EFI_VARS.fd","auto-read-only":true,"discard":"unmap"}'
             -blockdev '{"node-name":"efi-bios-eeprom-device","read-only":false,"driver":"raw","file":"efi-bios-eeprom-backend"}'
+            {{- end }}
             {{- if .Values.vm.useTpm }}
             -chardev socket,id=chrtpm,path=/run/swtpm-sock
             -tpmdev emulator,id=tpm0,chardev=chrtpm 

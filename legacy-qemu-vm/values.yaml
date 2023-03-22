@@ -9,6 +9,7 @@ vm:
   # machineUuid: "No default"
   # host: "No default"
   spicePort: 5901
+  efiBoot: true
   secureBoot: false
   useTpm: false
   disks:
