@@ -1,0 +1,7 @@
+FROM docker.io/alpine
+
+RUN apk update
+
+RUN apk add qemu-system-x86_64 qemu-modules ovmf
+
+ENTRYPOINT ["/bin/sh"]

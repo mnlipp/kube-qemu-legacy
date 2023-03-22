@@ -1,0 +1,16 @@
+# Default values for legacy-qemu-vm.
+
+image:
+  repository: docker-registry.domain.com
+  path: qemu/qemu-fedora:latest
+  pullPolicy: Always
+
+vm:
+  # machineUuid: "No default"
+  # host: "No default"
+  spicePort: 5901
+  secureBoot: false
+  useTpm: false
+  disks:
+  - device: /dev/vg/lv
+    size: 40Gi
