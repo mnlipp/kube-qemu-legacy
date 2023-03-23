@@ -56,7 +56,7 @@ spec:
             {{- end }}
             -object '{"id":"pc.ram","qom-type":"memory-backend-ram","size":{{ .Values.vm.maximumMemory }}}'
         -cpu host,migratable=on
-        -smp 8,sockets=8,cores=1,threads=1
+        -smp {{ .Values.vm.currentCpus }},maxcpus={{ .Values.vm.maximumCpus }},sockets={{ .Values.vm.maximumCpus }},cores=1,threads=1
         -m {{ div .Values.vm.maximumMemory 1048576 }}
         -accel kvm
         -global kvm-pit.lost_tick_policy=delay
