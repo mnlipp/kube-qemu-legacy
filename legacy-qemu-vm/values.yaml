@@ -17,7 +17,7 @@ vm:
   currentCpus: 2
   # Specify using string (too big, will be converted to float) 
   maximumMemory: "8589934592"
-  currentMemory: "8589934592"
+  # currentMemory: "Optional"
   disks:
   - device: /dev/vg/lv
     size: 40Gi

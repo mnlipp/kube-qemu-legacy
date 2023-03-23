@@ -117,14 +117,15 @@ spec:
       shutdownVM() {
           echo Shutting down VM
           socat - unix-connect:/var/local/qemu/monitor.sock <<- EOD
-      {"execute": "qmp_capabilities"}
-      {"execute": "system_powerdown"}
+      { "execute": "qmp_capabilities" }
+      { "execute": "system_powerdown" }
       EOD
       }
       
       trap shutdownVM SIGTERM
       
       {{- if .Values.vm.useTpm }}
+      
       echo Starting software TPM2...      
       swtpm socket --tpm2 \
         --tpmstate dir=/var/local/qemu \
@@ -140,6 +141,16 @@ spec:
       echo Starting VM...
       /usr/bin/qemu-system-x86_64 ${qemu_args[@]} &
       qemu_pid=$!
+
+      {{- if .Values.vm.currentMemory }}
+      
+      echo Adjusting balloon...
+      sleep 1
+      socat - unix-connect:/var/local/qemu/monitor.sock <<- EOD
+      { "execute": "qmp_capabilities" }
+      { "execute": "balloon", "arguments": { "value": {{ .Values.vm.currentMemory }} } }
+      EOD
+      {{- end }}
       
       while true; do
         wait $qemu_pid
