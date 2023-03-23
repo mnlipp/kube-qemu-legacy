@@ -8,6 +8,7 @@ image:
 vm:
   # machineUuid: "No default"
   # host: "No default"
+  # mac: "Optional"
   spicePort: 5901
   efiBoot: true
   secureBoot: false

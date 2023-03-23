@@ -90,7 +90,7 @@ spec:
         -blockdev '{"node-name":"container-{{ $index }}-device","read-only":false,"driver":"raw","file":"container-{{ $index }}-backend"}'
         {{- end }}
         -netdev tap,id=hostnet0,script=/etc/qemu-ifup,downscript=no
-        -device virtio-net-pci,netdev=hostnet0,id=net0,bus=pci.1,addr=0x0
+        -device virtio-net-pci,netdev=hostnet0,id=net0,bus=pci.1,addr=0x0{{ if .Values.vm.mac }},mac={{ .Values.vm.mac }}{{ end }}
         -chardev pty,id=charserial0
         -device isa-serial,chardev=charserial0,id=serial0,index=0
         -chardev socket,id=charchannel0,path=/var/local/qemu/org.qemu.guest_agent.0,server=on,wait=off
