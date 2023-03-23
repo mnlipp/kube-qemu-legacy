@@ -54,10 +54,10 @@ spec:
             -tpmdev emulator,id=tpm0,chardev=chrtpm 
             -device tpm-tis,tpmdev=tpm0
             {{- end }}
-            -object '{"id":"pc.ram","qom-type":"memory-backend-ram","size":8589934592}'
+            -object '{"id":"pc.ram","qom-type":"memory-backend-ram","size":{{ .Values.vm.maximumMemory }}}'
         -cpu host,migratable=on
         -smp 8,sockets=8,cores=1,threads=1
-        -m 8192
+        -m {{ div .Values.vm.maximumMemory 1048576 }}
         -accel kvm
         -global kvm-pit.lost_tick_policy=delay
         -overcommit mem-lock=off
