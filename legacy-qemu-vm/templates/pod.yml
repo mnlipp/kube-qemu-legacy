@@ -9,7 +9,7 @@ metadata:
 spec:
   containers:
   - name: {{ .Release.Name }}
-    image: {{ .Values.image.repository }}/{{ .Values.image.path }}
+    image: {{ .Values.image.repository }}/{{ .Values.image.path }}:{{ .Chart.AppVersion }}
     resources: {}
     imagePullPolicy: {{ .Values.image.pullPolicy }}
     volumeMounts:
