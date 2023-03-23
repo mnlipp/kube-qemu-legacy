@@ -13,6 +13,10 @@ vm:
   efiBoot: true
   secureBoot: false
   useTpm: false
+  maximumCpus: 4
+  currentCpus: 2
+  maximumMemory: 8589934592
+  currentMemory: 8589934592
   disks:
   - device: /dev/vg/lv
     size: 40Gi
