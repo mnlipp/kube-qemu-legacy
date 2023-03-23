@@ -173,4 +173,5 @@ spec:
       claimName: {{ $.Release.Name }}-pvc-{{ $index }}
   {{- end }}
   hostNetwork: true
-  restartPolicy: Always
+  terminationGracePeriodSeconds: 60
+  restartPolicy: Never
