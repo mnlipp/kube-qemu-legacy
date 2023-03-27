@@ -1,0 +1,26 @@
+FROM archlinux/archlinux
+
+RUN systemd-firstboot --setup-machine-id
+
+RUN pacman -Suy --noconfirm \
+    && pacman -S --noconfirm qemu-base qemu-virtiofsd \
+        edk2-ovmf swtpm iproute2 bridge-utils socat \
+    && pacman -Scc --noconfirm
+
+# Remove all targets.
+# We use the system dbus from the host, which already runs. Commenting out the line
+# with BusName prevents this systemd from trying to start its own. (Disabling the
+# socket makes sure that we detect possible additional future attempts.)
+RUN (cd /lib/systemd/system/sysinit.target.wants/; for i in *; do [ $i == systemd-tmpfiles-setup.service ] || rm -f $i; done); \
+    rm -f /lib/systemd/system/multi-user.target.wants/*;\
+    rm -f /etc/systemd/system/*.wants/*;\
+    rm -f /lib/systemd/system/local-fs.target.wants/*; \
+    rm -f /lib/systemd/system/sockets.target.wants/*udev*; \
+    rm -f /lib/systemd/system/sockets.target.wants/*initctl*; \
+    rm -f /lib/systemd/system/basic.target.wants/*;\
+    rm -f /lib/systemd/system/anaconda.target.wants/*; \
+    systemctl set-default multi-user.target
+
+ADD qemu-ifup /etc
+
+CMD ["/bin/sh"]

@@ -1,0 +1,10 @@
+#!/bin/bash
+# A br0 bridge should be already set up.
+# Compare with:
+# http://en.wikibooks.org/wiki/QEMU/Networking#qemu-ifup
+#
+# For the bridge setup, see:
+# http://wiki.libvirt.org/page/Networking#Fedora.2FRHEL_Bridging
+# http://gist.github.com/393525
+ip link set "$1" up
+brctl addif br0 "$1"
