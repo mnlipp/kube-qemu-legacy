@@ -156,6 +156,7 @@ spec:
       { "execute": "qmp_capabilities" }
       { "execute": "balloon", "arguments": { "value": {{ .Values.vm.currentMemory }} } }
       EOD
+      sleep 1
       {{- end }}
       
       while true; do
