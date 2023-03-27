@@ -9,7 +9,7 @@ metadata:
 spec:
   containers:
   - name: {{ .Release.Name }}
-    image: {{ .Values.image.repository }}/{{ .Values.image.path }}:{{ .Chart.AppVersion }}
+    image: {{ .Values.image.repository }}/{{ .Values.image.path }}:{{ .Values.image.version }}
     resources: {}
     imagePullPolicy: {{ .Values.image.pullPolicy }}
     volumeMounts:
@@ -33,6 +33,12 @@ spec:
     - /bin/bash
     - -xc
     - |
+      ovmf_code_path=/usr/share/OVMF/OVMF_CODE.fd
+      if [ ! -r "$ovmf_code_path" ]; then
+          # Arch Linux
+          ovmf_code_path=/usr/share/edk2/x64/OVMF_CODE.fd
+      fi
+      
       qemu_args=(
         -nodefaults
         -no-user-config
@@ -44,7 +50,7 @@ spec:
             -object '{"qom-type":"secret","id":"masterKey0","format":"raw","file":"/var/local/qemu/master-key.aes"}'
             {{- end }}
             {{- if .Values.vm.efiBoot }}
-            -blockdev '{"node-name":"efi-bios-rom-backend","driver":"file","filename":"/usr/share/OVMF/OVMF_CODE.fd","auto-read-only":true,"discard":"unmap"}'
+            -blockdev '{"node-name":"efi-bios-rom-backend","driver":"file","filename":"'${ovmf_code_path}'","auto-read-only":true,"discard":"unmap"}'
             -blockdev '{"node-name":"efi-bios-rom-device","driver":"raw","read-only":true,"file":"efi-bios-rom-backend"}'
             -blockdev '{"node-name":"efi-bios-eeprom-backend","driver":"file","filename":"/var/local/qemu/EFI_VARS.fd","auto-read-only":true,"discard":"unmap"}'
             -blockdev '{"node-name":"efi-bios-eeprom-device","read-only":false,"driver":"raw","file":"efi-bios-eeprom-backend"}'

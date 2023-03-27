@@ -4,7 +4,4 @@ description: Create legacy qemu VMs (from fixed resources)
 type: application
 
 # This is the chart version.
-version: "1.0.0"
-
-# This is the version number of the application being deployed.
-appVersion: "1.0"
+version: "1.1.0"

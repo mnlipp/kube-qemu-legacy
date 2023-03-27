@@ -3,6 +3,7 @@
 image:
   repository: docker-registry.domain.com
   path: qemu/qemu-fedora
+  version: latest
   pullPolicy: IfNotPresent
 
 vm:
