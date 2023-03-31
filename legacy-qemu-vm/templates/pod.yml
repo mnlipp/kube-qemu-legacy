@@ -63,6 +63,7 @@ spec:
       
       # Create network arguments
       qemu_network_args=()
+      i=1
       for tap in ${!taps[@]}; do
         qemu_network_args+=( -netdev tap,id=hostnet$i,ifname=$tap,script=no,downscript=no )
         mac=""
