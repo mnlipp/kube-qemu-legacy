@@ -42,10 +42,10 @@ spec:
       # Create taps for bridges
       declare -A taps
       declare -A tap_macs
+      i=1
       {{- range $index, $network := .Values.vm.networks }}
       {{- if hasKey $network "bridge" }}
-      i=1
-      while [ $i -lt 10 ]; do
+      while [ $i -lt 999 ]; do
         tap=tap$i
         if ip tuntap add mode tap $tap; then
           ip link set $tap up
