@@ -39,6 +39,40 @@ spec:
           ovmf_code_path=/usr/share/edk2/x64/OVMF_CODE.fd
       fi
       
+      # Create taps for bridges
+      declare -A taps
+      declare -A tap_macs
+      {{- range $index, $network := .Values.vm.networks }}
+      {{- if hasKey $network "bridge" }}
+      i=1
+      while [ $i -lt 10 ]; do
+        tap=tap$i
+        if ip tuntap add mode tap $tap; then
+          ip link set $tap up
+          brctl addif {{ if hasKey $network.bridge "name" }}{{ $network.bridge.name }}{{ else }}br0{{ end }} $tap
+          taps[$tap]={{ if hasKey $network.bridge "name" }}{{ $network.bridge.name }}{{ else }}br0{{ end }}
+          break;
+        fi
+        i=$((i+1))
+      done
+      {{- if $network.bridge.mac }}
+      tap_macs[$tap]="{{ $network.bridge.mac }}"
+      {{- end }}
+      {{- end }}
+      {{- end }}
+      
+      # Create network arguments
+      qemu_network_args=()
+      for tap in ${!taps[@]}; do
+        qemu_network_args+=( -netdev tap,id=hostnet$i,ifname=$tap,script=no,downscript=no )
+        mac=""
+        if [ ! -z ${tap_macs[$tap]} ]; then
+          mac=",mac=${tap_macs[$tap]}"
+        fi
+        qemu_network_args+=( -device virtio-net-pci,id=net$i,netdev=hostnet$i$mac )
+        i=$((i+1))
+      done
+      
       qemu_args=(
         -no-user-config
         -name guest={{ .Release.Name }},debug-threads=on
@@ -79,8 +113,7 @@ spec:
         -blockdev '{"node-name":"drive-{{ $index }}-backend","driver":"host_device","filename":"/dev/disk-{{ $index }}","aio":"native","cache":{"direct":true,"no-flush":false},"auto-read-only":true,"discard":"unmap"}'
         -blockdev '{"node-name":"drive-{{ $index }}-device","read-only":false,"driver":"raw","file":"drive-{{ $index }}-backend"}'
         {{- end }}
-        -netdev tap,id=hostnet0,br=br0,script=/etc/qemu-ifup,downscript=no
-        -device virtio-net-pci,netdev=hostnet0,id=net0{{ if .Values.vm.mac }},mac={{ .Values.vm.mac }}{{ end }}
+        ${qemu_network_args[@]}
         -chardev pty,id=charserial0
         -device isa-serial,chardev=charserial0,id=serial0,index=0
         -chardev socket,id=charchannel0,path=/var/local/qemu/org.qemu.guest_agent.0,server=on,wait=off
@@ -152,6 +185,13 @@ spec:
         # wait has been interrupted
       done
       echo VM has terminated
+      
+      # Cleaning up
+      for tap in ${!taps[@]}; do
+        brctl delif ${taps[$tap]} $tap
+        ip link set $tap down
+        ip tuntap delete mode tap $tap
+      done
   volumes:
   # Not needed because pod is priviledged:
   # - name: dev-kvm
