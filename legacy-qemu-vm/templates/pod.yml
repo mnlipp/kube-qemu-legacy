@@ -127,6 +127,7 @@ spec:
         -device ich9-intel-hda,id=sound0
         -device hda-duplex,id=sound0-codec0,bus=sound0.0,cad=0,audiodev=audio1
         -chardev spicevmc,id=charredir0,name=usbredir
+        -device usb-tablet,id=input0,bus=usb.0,port=1
         -device usb-redir,chardev=charredir0,id=redir0,bus=usb.0,port=2
         -chardev spicevmc,id=charredir1,name=usbredir
         -device usb-redir,chardev=charredir1,id=redir1,bus=usb.0,port=3
