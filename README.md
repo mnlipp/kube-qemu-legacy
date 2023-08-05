@@ -1,3 +1,5 @@
+*You should move on to the [final solution](https://mnlipp.github.io/VM-Operator/)*
+
 # Run libvirt-VMs Qemu in Kubernetes
 
 This is an intermediate step towards a Kubernetes operator
